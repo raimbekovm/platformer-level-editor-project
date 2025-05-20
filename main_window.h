@@ -1,30 +1,36 @@
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H
 
-#include <QtWidgets>
+#include <QMainWindow>
+#include <QTableWidget>
+#include <QMap>
+#include <QPixmap>
+#include <QStack>
+#include <QPushButton>
+#include <QDialog>
+#include <QFileDialog>
+#include <QFile>
+#include <QMouseEvent>
 
 class MainWindow : public QMainWindow
 {
+    Q_OBJECT
+
 public:
-    MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
+    void mousePressEvent(QMouseEvent* event) override;
 
 private:
-    void selectTile(char tile);
-    void onTileClicked(int row, int col);
-    void undoTilePlacement();
-
-    void clearLevel();
-    void resizeLevel();
-
-    void exportToFile();
-
     struct TileAction
     {
-        // TODO
+        int row;
+        int col;
+        QString previousType;
+        QString newType;
     };
 
     enum class TileType
@@ -39,14 +45,24 @@ private:
         Air      = ' '
     };
 
+    void selectTile(char tile);
+    void onTileClicked(int row, int col);
+    void undoTilePlacement();
+
+    void clearLevel();
+    void resizeLevel();
+
+    void exportToFile();
+
     TileType selectedTile;
     QStack<TileAction> undoStack;
 
-    /*
-    QTableWidget *level;
-            OR
-    QGraphicsGridLayout *level;
-    */
+    QTableWidget* gridWidget;
+    QMap<QString, QPixmap> tileSprites;
+    
+    void setupGrid();
+    void loadSprites();
+    void setupGridCell(int row, int col);
 
     QPushButton* createButton(const QIcon &icon, std::function<void()> action);
 };
