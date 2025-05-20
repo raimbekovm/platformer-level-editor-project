@@ -2,15 +2,12 @@
 #define MAIN_WINDOW_H
 
 #include <QMainWindow>
-#include <QTableWidget>
 #include <QMap>
 #include <QPixmap>
-#include <QStack>
-#include <QPushButton>
-#include <QDialog>
-#include <QFileDialog>
-#include <QFile>
-#include <QMouseEvent>
+#include <QLabel>
+#include <QStatusBar>
+#include "grid_widget.h"
+#include "tile_toolbar.h"
 
 class MainWindow : public QMainWindow
 {
@@ -20,51 +17,26 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-protected:
-    void keyPressEvent(QKeyEvent *event) override;
-    void mousePressEvent(QMouseEvent* event) override;
+private slots:
+    void onTileSelected(char type);
+    void onTilePlaced(int row, int col, const QString& type);
+    void onClearGrid();
+    void onResizeGrid();
+    void onUndo();
 
 private:
-    struct TileAction
-    {
-        int row;
-        int col;
-        QString previousType;
-        QString newType;
-    };
+    void setupUI();
+    void loadTileSprites();
+    void setupEditToolbar();
+    void setupMenuBar();
+    void setupStatusBar();
+    void updateStatusBar(int row, int col, const QString& type);
 
-    enum class TileType
-    {
-        Coin     = '*',
-        Enemy    = '&',
-        Exit     = 'E',
-        Player   = '@',
-        Spikes   = '^',
-        Wall     = '#',
-        DarkWall = '=',
-        Air      = ' '
-    };
-
-    void selectTile(char tile);
-    void onTileClicked(int row, int col);
-    void undoTilePlacement();
-
-    void clearLevel();
-    void resizeLevel();
-
-    void exportToFile();
-
-    TileType selectedTile;
-    QStack<TileAction> undoStack;
-
-    QTableWidget* gridWidget;
+    GridWidget* gridWidget;
+    TileToolbar* tileToolbar;
+    QToolBar* editToolBar;
     QMap<QString, QPixmap> tileSprites;
-    
-    void setupGrid();
-    void loadSprites();
-    void setupGridCell(int row, int col);
-
-    QPushButton* createButton(const QIcon &icon, std::function<void()> action);
+    QLabel* statusLabel;
 };
 
 #endif // MAIN_WINDOW_H
